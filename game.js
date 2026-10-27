@@ -375,16 +375,38 @@
   // ---------- Autocomplete ----------
   const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
   const SEARCH = PRODUCTS.map((p) => norm(p.name));
-  let matches = [], active = -1;
+  const AKA = PRODUCTS.map((p) => (p.aka || []).map(norm));
+  const CATS = PRODUCTS.map((p) => norm(p.category));
+  let matches = [], active = -1, why = {};
+
+  // Lower rank = better. Name matches beat search-word matches, which beat category matches.
+  function rank(i, q, words) {
+    const name = SEARCH[i];
+    const has = (text) => words.every((w) => text.split(" ").some((t) => t.startsWith(w)) || text.includes(w));
+    if (name.startsWith(q)) return [0];
+    if (name.split(" ").some((t) => t.startsWith(q))) return [1];
+    if (has(name)) return [2];
+    const aka = AKA[i].find((a) => a.startsWith(q)) || AKA[i].find((a) => has(a));
+    if (aka) return [3, aka];
+    if (has(`${name} ${AKA[i].join(" ")} ${CATS[i]}`)) return [4, PRODUCTS[i].category.toLowerCase()];
+    return null;
+  }
 
   function updateList() {
     const q = norm(els.input.value);
     if (!q) { closeList(); return; }
     const words = q.split(" ");
-    matches = PRODUCTS.map((_, i) => i)
-      .filter((i) => !state.guesses.includes(i) && words.every((w) => SEARCH[i].includes(w)))
-      .sort((a, b) => SEARCH[a].indexOf(words[0]) - SEARCH[b].indexOf(words[0]) || SEARCH[a].localeCompare(SEARCH[b]))
-      .slice(0, 8);
+    why = {};
+    const scored = [];
+    PRODUCTS.forEach((_, i) => {
+      if (state.guesses.includes(i)) return;
+      const r = rank(i, q, words);
+      if (r) { scored.push([r[0], i]); if (r[1]) why[i] = r[1]; }
+    });
+    matches = scored
+      .sort((a, b) => a[0] - b[0] || SEARCH[a[1]].localeCompare(SEARCH[b[1]]))
+      .map(([, i]) => i)
+      .slice(0, 15);
     active = matches.length ? 0 : -1;
     drawList();
   }
@@ -396,7 +418,7 @@
       li.id = `opt-${i}`;
       li.setAttribute("role", "option");
       li.setAttribute("aria-selected", n === active);
-      li.append(el("span", "", PRODUCTS[i].name), el("small", "", PRODUCTS[i].category));
+      li.append(el("span", "", PRODUCTS[i].name), el("small", "", why[i] ? `“${why[i]}”` : PRODUCTS[i].category));
       li.addEventListener("mousedown", (e) => { e.preventDefault(); submitGuess(i); });
       els.list.append(li);
     });

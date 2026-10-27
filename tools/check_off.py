@@ -21,10 +21,16 @@ def load_products():
     return json.loads(raw.decode("utf-8"))
 
 
-def get(url):
+def get(url, tries=4):
     req = urllib.request.Request(url, headers={"User-Agent": UA})
-    with urllib.request.urlopen(req, timeout=30) as r:
-        return json.loads(r.read().decode("utf-8"))
+    for attempt in range(tries):
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                return json.loads(r.read().decode("utf-8"))
+        except Exception:
+            if attempt == tries - 1:
+                raise
+            time.sleep(5 * (attempt + 1))  # rate limited or busy; back off
 
 
 def words(text):
@@ -41,7 +47,7 @@ def search(name):
     q = re.sub(r"\(.*?\)", "", name).replace("&", "and")
     url = "https://search.openfoodfacts.org/search?" + urllib.parse.urlencode({
         "q": f'{q} countries_tags:"en:united-states"',
-        "page_size": 8,
+        "page_size": 5,
         "fields": "code,product_name,brands",
     })
     return get(url).get("hits", [])
@@ -69,10 +75,12 @@ def main():
                     best.update(score=s, code=hit["code"], off_name=hit.get("product_name"), off_text=text)
         except Exception as e:  # keep going; note the failure
             best["error"] = str(e)
-        print(f'{best["score"]:.2f}  {prod["name"]}  ->  {best["off_name"]} ({best["code"]})', flush=True)
+        note = f'  ERROR: {best["error"]}' if "error" in best else ""
+        print(f'{best["score"]:.2f}  {prod["name"]}  ->  {best["off_name"]} ({best["code"]}){note}', flush=True)
         report.append(best)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
         time.sleep(1)
-    out.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
     print("wrote", out)
 
 
