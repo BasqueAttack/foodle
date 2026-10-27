@@ -40,6 +40,12 @@ python tools/check_off.py
 
 This writes `tools/off_report.json`, which lists the closest Open Food Facts match for each product and a word-overlap score. Review the low scores against the actual package.
 
+### Still to verify
+
+The first check (October 2026) confirmed or updated most lists. For the products below, Open Food Facts had only a different variant, garbled text, or no entry, so check them against a real package:
+
+Mountain Dew, Capri Sun Pacific Cooler, Kool-Aid Tropical Punch Mix, Nesquik Chocolate Milk, Takis Fuego, Cocoa Puffs, Wonder Classic White Bread, Hot Pockets Pepperoni Pizza, DiGiorno Rising Crust Pepperoni, Bagel Bites, Stouffer's Lasagna, Uncrustables, Kraft Singles, Velveeta, Miracle Whip, Marshmallow Fluff, SpaghettiOs, Campbell's Chicken Noodle Soup, Stove Top Stuffing, McDonald's Chicken McNuggets, McDonald's French Fries.
+
 ## Host it on GitHub Pages
 
 In the repo on GitHub, go to **Settings → Pages**, set **Source** to *Deploy from a branch*, and pick `main` / `(root)`. The site goes live at `https://<username>.github.io/foodle/`.
