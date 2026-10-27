@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Foodle</title>
+  <meta name="description" content="Read the ingredient list. Guess the ultraprocessed food. A new puzzle every day.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="page">
+    <header class="masthead">
+      <div class="brand">
+        <h1>Foodle</h1>
+        <p class="tagline">Read the label. Name the food.</p>
+      </div>
+      <div class="modes" role="tablist" aria-label="Game mode">
+        <button id="mode-daily" role="tab" aria-selected="true">Daily</button>
+        <button id="mode-practice" role="tab" aria-selected="false">Practice</button>
+      </div>
+    </header>
+
+    <section class="label" aria-labelledby="label-title">
+      <div class="label-top">
+        <h2 id="label-title">Ingredients</h2>
+        <span id="puzzle-id" class="puzzle-id"></span>
+      </div>
+      <p id="ingredients" class="ingredients"></p>
+      <div class="label-foot">
+        <span id="ingredient-count"></span>
+        <span id="guess-count"></span>
+      </div>
+    </section>
+
+    <form id="guess-form" class="guess-form" autocomplete="off">
+      <div class="combo">
+        <label for="guess-input" class="visually-hidden">Your guess</label>
+        <input id="guess-input" type="text" placeholder="Type a food or drink…" role="combobox"
+               aria-expanded="false" aria-controls="suggestions" aria-autocomplete="list">
+        <ul id="suggestions" class="suggestions" role="listbox" hidden></ul>
+      </div>
+      <button id="guess-btn" type="submit">Guess</button>
+    </form>
+    <p id="form-msg" class="form-msg" role="status" aria-live="polite"></p>
+
+    <section class="known" aria-label="What you know so far">
+      <h3>What you know</h3>
+      <div id="known" class="known-grid"></div>
+    </section>
+
+    <section id="result" class="result" hidden aria-live="polite"></section>
+
+    <section class="board" aria-label="Your guesses">
+      <div class="board-scroll">
+        <table id="board">
+          <thead>
+            <tr>
+              <th scope="col">Guess</th>
+              <th scope="col">Category</th>
+              <th scope="col">Color</th>
+              <th scope="col">Taste</th>
+              <th scope="col">Storage</th>
+              <th scope="col">Package</th>
+              <th scope="col">Year</th>
+              <th scope="col">Company</th>
+            </tr>
+          </thead>
+          <tbody id="board-body"></tbody>
+        </table>
+      </div>
+      <ul class="legend">
+        <li><span class="swatch hit"></span>Match</li>
+        <li><span class="swatch part"></span>Partly right (or year within 10)</li>
+        <li><span class="swatch miss"></span>No match</li>
+        <li><span class="arrow-key">↑ ↓</span>Answer is newer / older</li>
+      </ul>
+    </section>
+
+    <section id="stats" class="stats" aria-label="Your daily stats"></section>
+
+    <details class="catalog">
+      <summary>All 100 foods</summary>
+      <div id="catalog"></div>
+    </details>
+
+    <footer class="colophon">
+      <p>Ingredient lists are US labels, checked against <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a> (data under the Open Database License). Recipes change, so the package in your pantry may differ.</p>
+      <p>Year is when the brand first went on sale. Company is the current US owner.</p>
+    </footer>
+  </main>
+
+  <script src="products.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
