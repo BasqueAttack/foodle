@@ -1,6 +1,8 @@
 """Compare Foodle's ingredient lists with Open Food Facts (US products).
 
-Usage:  python tools/check_off.py [output.json]
+Usage:  python tools/check_off.py [output.json] [--new]
+
+--new keeps the existing report and only checks products it doesn't list yet.
 
 For each product in products.js, searches Open Food Facts for US matches,
 pulls their English ingredient text, and reports the closest match with a
@@ -60,9 +62,17 @@ def ingredients(code):
 
 
 def main():
-    out = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "tools" / "off_report.json"
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    only_new = "--new" in sys.argv
+    out = Path(args[0]) if args else ROOT / "tools" / "off_report.json"
     report = []
+    if only_new and out.exists():
+        # Keep earlier results and only check products the report doesn't have yet.
+        report = json.loads(out.read_text(encoding="utf-8"))
+    done = {r["name"] for r in report}
     for prod in load_products():
+        if prod["name"] in done:
+            continue
         best = {"name": prod["name"], "score": 0, "code": None, "off_name": None, "off_text": ""}
         try:
             for hit in search(prod["name"]):

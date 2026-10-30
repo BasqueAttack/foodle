@@ -19,7 +19,7 @@ Each wrong guess gets a row of tiles, one for each attribute:
 - `index.html`: page structure
 - `style.css`: look and layout
 - `game.js`: game logic (daily puzzle, practice, hints, stats)
-- `products.js`: the 100 foods. Edit this file to add or fix products.
+- `products.js`: the list of foods (190 so far). Edit this file to add or fix products.
 - `tools/check_off.py`: compares every ingredient list with Open Food Facts
 
 ## Run it locally
@@ -40,9 +40,15 @@ python tools/check_off.py
 
 This writes `tools/off_report.json`, which lists the closest Open Food Facts match for each product and a word-overlap score. Review the low scores against the actual package.
 
+After adding products, run `python tools/check_off.py --new` to check only the ones the report doesn't have yet.
+
 ### Still to verify
 
-The first check (October 2026) confirmed or updated most lists. For the products below, Open Food Facts had only a different variant, garbled text, or no entry, so check them against a real package:
+The checks (October 2026) confirmed or updated most lists. For the products below, Open Food Facts had only a different variant, garbled text, or no entry, so check them against a real package.
+
+Added in the second batch: Cherry Coke, International Delight French Vanilla, Cheez-It White Cheddar, Hershey's Cookies 'n' Creme, Tootsie Roll, Hostess CupCakes, Little Debbie Swiss Rolls, Little Debbie Cosmic Brownies, Keebler Fudge Stripes, King's Hawaiian Original Rolls, Hot Pockets Ham & Cheese, Totino's Party Pizza Pepperoni, Tyson Fully Cooked Chicken Nuggets, Marie Callender's Chicken Pot Pie, Gorton's Classic Fish Sticks, Oberto Original Beef Jerky, Oscar Mayer Classic Wieners, Ball Park Beef Franks, Yoplait Original Strawberry, Drumstick Classic Vanilla, Hidden Valley Ranch Seasoning Mix, Skippy Creamy Peanut Butter, Maruchan Ramen Chicken, Rice-A-Roni Chicken, Dinty Moore Beef Stew, McDonald's Hash Brown.
+
+From the first batch:
 
 Mountain Dew, Capri Sun Pacific Cooler, Kool-Aid Tropical Punch Mix, Nesquik Chocolate Milk, Takis Fuego, Cocoa Puffs, Wonder Classic White Bread, Hot Pockets Pepperoni Pizza, DiGiorno Rising Crust Pepperoni, Bagel Bites, Stouffer's Lasagna, Uncrustables, Kraft Singles, Velveeta, Miracle Whip, Marshmallow Fluff, SpaghettiOs, Campbell's Chicken Noodle Soup, Stove Top Stuffing, McDonald's Chicken McNuggets, McDonald's French Fries.
 

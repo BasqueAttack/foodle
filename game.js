@@ -331,6 +331,7 @@
   }
 
   function renderCatalog() {
+    document.getElementById("catalog-title").textContent = `All ${PRODUCTS.length} foods`;
     const groups = {};
     PRODUCTS.forEach((p, i) => (groups[p.category] ||= []).push(i));
     els.catalog.textContent = "";
@@ -453,7 +454,7 @@
     const exact = SEARCH.indexOf(q);
     if (exact >= 0) { submitGuess(exact); return; }
     if (matches.length && active >= 0) { submitGuess(matches[active]); return; }
-    say("That isn't one of the 100 foods. Pick a name from the list.");
+    say(`That isn't one of the ${PRODUCTS.length} foods. Pick a name from the list.`);
   });
 
   els.daily.addEventListener("click", startDaily);
