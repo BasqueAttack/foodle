@@ -20,7 +20,18 @@ Each wrong guess gets a row of tiles, one for each attribute:
 - `style.css`: look and layout
 - `game.js`: game logic (daily puzzle, practice, hints, stats)
 - `products.js`: the list of foods (190 so far). Edit this file to add or fix products.
+- `schedule.js`: which food is the daily answer on each day. Generated, don't edit by hand.
+- `tools/schedule.py`: updates `schedule.js`
 - `tools/check_off.py`: compares every ingredient list with Open Food Facts
+
+## Adding or removing foods
+
+1. Edit `products.js`.
+2. Run `python tools/schedule.py`. It slots new foods into future days and drops removed ones from future days. Past puzzles, today and tomorrow never change, so players' streaks are safe.
+3. Run `python tools/check_off.py --new` to check the new ingredient lists.
+4. Commit all of it, including `schedule.js`.
+
+Don't rename a food that has already been a daily answer. `python tools/schedule.py --check` warns about this. The schedule keeps at least a year of puzzles ahead, so rerun the tool now and then (or after any change) to extend it.
 
 ## Run it locally
 

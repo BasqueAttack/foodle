@@ -39,7 +39,11 @@
   store.stats ||= { played: 0, wins: 0, streak: 0, best: 0, dist: [0, 0, 0, 0, 0, 0], lastDay: null };
 
   // ---------- Daily puzzle order ----------
-  // A fixed shuffle so every product appears once before any repeats.
+  // schedule.js lists one food name per day (index 0 = Foodle #1), so adding
+  // foods never changes past or current puzzles. tools/schedule.py extends it.
+  // The seeded shuffle below is only a fallback if the schedule runs out.
+  const SCHEDULE = window.FOODLE_SCHEDULE || [];
+  const BY_NAME = new Map(PRODUCTS.map((p, i) => [p.name, i]));
   function mulberry32(seed) {
     return () => {
       seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
@@ -61,6 +65,8 @@
     return Math.max(0, Math.round((today - LAUNCH) / 86400000));
   }
   function dailyIndex(day) {
+    if (BY_NAME.has(SCHEDULE[day])) return BY_NAME.get(SCHEDULE[day]);
+    console.warn(`Foodle #${day + 1} is missing from schedule.js; run tools/schedule.py`);
     const cycle = Math.floor(day / PRODUCTS.length);
     return shuffled(PRODUCTS.length, 20261027 + cycle)[day % PRODUCTS.length];
   }
@@ -70,10 +76,12 @@
 
   function startDaily() {
     const day = dayNumber();
+    const answer = dailyIndex(day);
     const saved = store.daily;
-    state = (saved && saved.day === day)
-      ? { ...saved, mode: "daily" }
-      : { mode: "daily", day, answer: dailyIndex(day), guesses: [], done: false, won: false };
+    // Saved progress uses names, so it survives foods being added or reordered.
+    state = (saved && saved.day === day && saved.answer === PRODUCTS[answer].name)
+      ? { ...saved, mode: "daily", answer, guesses: saved.guesses.filter((n) => BY_NAME.has(n)).map((n) => BY_NAME.get(n)) }
+      : { mode: "daily", day, answer, guesses: [], done: false, won: false };
     render(true);
   }
 
@@ -87,7 +95,13 @@
   }
 
   function persist() {
-    if (state.mode === "daily") { store.daily = state; save(store); }
+    if (state.mode !== "daily") return;
+    store.daily = {
+      ...state,
+      answer: PRODUCTS[state.answer].name,
+      guesses: state.guesses.map((i) => PRODUCTS[i].name),
+    };
+    save(store);
   }
 
   // ---------- Comparison ----------
